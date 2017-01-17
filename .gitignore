@@ -31,3 +31,9 @@
 # Debug files
 *.dSYM/
 *.su
+
+# Editor files
+.zedstate
+
+# Compiled versions
+tinyrest
