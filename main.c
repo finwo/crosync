@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "defines.h"
@@ -30,6 +31,17 @@ int main( int argc, char **argv )
         print_help(*argv, address, port, datadir);
         exit(0);
     }
+  }
+  
+  // Check if data directory exists
+  struct stat sb;
+  if( stat(datadir, &sb)!=0 ) {
+    fprintf(stderr, "Directory '%s' does not exist\n", datadir);
+    exit(1);
+  }
+  if(!S_ISDIR(sb.st_mode)) {
+    fprintf(stderr, "'%s' is not a directory\n", datadir);
+    exit(1);
   }
   
   printf("Address:   %s\n", address);
