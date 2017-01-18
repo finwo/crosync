@@ -6,7 +6,7 @@ CFLAGS = -I.
 LDFLAGS =
 
 default:
-	$(CC) $(CFLAGS) main.c events.c -o tinycrud
+	$(CC) $(CFLAGS) main.c events.c messages.c -o tinycrud
 
 clean:
 	for f in `find | grep -e \\\.o$$` ; do echo $$f ; rm $$f ; done
