@@ -1,1 +1,1 @@
-#define SERVER_STRING "Server: tinyrest/0.0.0"
+#define SERVER_STRING "Server: tinycrud/0.0.0"

@@ -6,8 +6,8 @@ CFLAGS = -I.
 LDFLAGS =
 
 default:
-	$(CC) $(CFLAGS) main.c -o tinyrest
+	$(CC) $(CFLAGS) main.c -o tinycrud
 
 clean:
 	for f in `find | grep -e \\\.o$$` ; do echo $$f ; rm $$f ; done
-	rm -f tinyrest
+	rm -f tinycrud

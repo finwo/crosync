@@ -1,4 +1,4 @@
-# Finwo / tinyrest
+# Finwo / tinycrud
 
 Tiny http-based CRUD engine
 
