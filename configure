@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# build makefile
+cat make/compiler       >  Makefile
+cat make/config         >> Makefile
+cat driver/*/make       >> Makefile
+cat make/target.default >> Makefile

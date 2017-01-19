@@ -35,8 +35,9 @@
 # Editor files
 .zedstate
 
-# Compiled versions
-tinycrud
+# Compiled files
+/Makefile
+/tinycrud
 
 # Test data
 /data/
