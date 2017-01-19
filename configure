@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# build makefile
+echo "Building Makefile"
 cat make/compiler       >  Makefile
 cat make/config         >> Makefile
 cat driver/*/make       >> Makefile

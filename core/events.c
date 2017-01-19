@@ -22,7 +22,7 @@ Listener *listeners;
 int listeners_count = 0;
 
 // We'll use this more than once
-int pointerSize = sizeof(Listener *);
+int eventPointerSize = sizeof(Listener *);
 
 // Register an event
 void event_on( char *eventName, void *function )
@@ -35,18 +35,18 @@ void event_on( char *eventName, void *function )
   
   // Make sure we have the memory
   if ( listeners ) {
-    newListLocation = realloc( listeners, pointerSize * listeners_count );
+    newListLocation = realloc( listeners, eventPointerSize * listeners_count );
     if ( newListLocation ) {
       listeners = (void *)newListLocation;
     } else {
       exit(1);
     }
   } else {
-    listeners = malloc( pointerSize * listeners_count );
+    listeners = malloc( eventPointerSize * listeners_count );
   }
   
   // 'Register' the listener
-  *(listeners+((listeners_count-1)*pointerSize)) = listener;
+  *(listeners+((listeners_count-1)*eventPointerSize)) = listener;
 }
 
 // Trigger an event
@@ -57,7 +57,7 @@ void event_fire( char *eventName, void *data )
   
   // Loop through listeners
   for( i = 0 ; i < listeners_count ; i++ ) {
-    listener = listeners + ( pointerSize * i );
+    listener = listeners + ( eventPointerSize * i );
     
     // Skip if the event name does not match
     if ( strcmp(eventName, listener->eventName) ) continue;
