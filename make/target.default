@@ -1,2 +1,2 @@
 default:
-	$(CC) $(CFLAGS) $(SRCFILES) -o tinycrud
+	$(CC) $(CFLAGS) $(SOURCES) -o tinycrud

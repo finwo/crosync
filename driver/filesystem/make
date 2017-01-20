@@ -1,2 +1,2 @@
 # filesystem driver
-SRCFILES += driver/filesystem/driver_filesystem.c
+SOURCES += driver/filesystem/driver_filesystem.c

@@ -3,9 +3,9 @@
 #include <string.h>
 
 #include "driver.h"
-#include "driver_usage.h"
 
 Driver *drivers;
+Driver *selectedDriver;
 int drivers_count = 0;
 
 int driverPointerSize = sizeof(Driver);
@@ -46,24 +46,51 @@ void driver_list() {
   }
 }
 
+// Select a driver
+// Returns if we were successful
 int driver_select(char *name) {
   int i;
   Driver *driver;
   for( i = 0 ; i < drivers_count ; i++ ) {
     driver = drivers + ( driverPointerSize * i );
     if(!strcmp(driver->name, name)) {
-      
-      // Copy pointers from the selected driver
-      driver_info               = driver->info;
-      driver_types              = driver->types;
-      driver_ids                = driver->ids;
-      driver_get_object         = driver->get;
-      driver_set_object         = driver->set;
-      driver_del_object         = driver->del;
-      driver_objects_containing = driver->containing;
-      
+      selectedDriver = driver;
       return 1;
     }
   }
   return 0;
+}
+
+// Structures for calling the driver's functions
+char * (*drv0)();
+char * (*drv1)(char *a0);
+char * (*drv2)(char *a0, char *a1);
+
+char * driver_info() {
+  drv0 = selectedDriver->info;
+  return (*drv0)();
+}
+char * driver_types() {
+  drv0 = selectedDriver->types;
+  return (*drv0)();
+}
+char * driver_ids(char *type) {
+  drv1 = selectedDriver->ids;
+  return (*drv1)(type);
+}
+char * driver_get_object(char *type, char *id) {
+  drv2 = selectedDriver->get;
+  return (*drv2)(type,id);
+}
+char * driver_set_object(char *type, char *object) {
+  drv2 = selectedDriver->set;
+  return (*drv2)(type,object);
+}
+char * driver_del_object(char *type, char *id) {
+  drv2 = selectedDriver->get;
+  return (*drv2)(type,id);
+}
+char * driver_objects_containing(char *type, char *search) {
+  drv2 = selectedDriver->get;
+  return (*drv2)(type,search);
 }

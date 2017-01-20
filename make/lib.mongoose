@@ -1,0 +1,2 @@
+# Mongoose library
+SOURCES += lib/mongoose/mongoose.c

@@ -3,5 +3,6 @@
 echo "Building Makefile"
 cat make/compiler       >  Makefile
 cat make/config         >> Makefile
+cat make/lib.*          >> Makefile
 cat driver/*/make       >> Makefile
 cat make/target.default >> Makefile

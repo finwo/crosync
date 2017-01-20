@@ -4,7 +4,15 @@
 
 // Prints driver info to stdout
 char *driver_filesystem_info() {
-  printf("Hello World\n");
+  printf("\n");
+  printf("Driver: filesystem\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
+  printf("\n");
 }
 
 // Returns pointer to CSV list of types

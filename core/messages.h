@@ -1,1 +1,1 @@
-void print_help(char *name, char *bind_address, int port, char *driver);
+void print_help(char *name, char *bind_address );

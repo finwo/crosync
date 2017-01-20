@@ -3,17 +3,19 @@
 #include "driver.h"
 #include "messages.h"
 
-void print_help( char *name, char *bind_address, int port, char *driver )
+void print_help( char *name, char *bind_address )
 {
   printf("\n");
   printf("Usage: %s [options]\n", name);
   printf("\n");
-  printf("Options:\n");
+  printf("Common options:\n");
   printf("  -h  Print this help\n");
-  printf("  -a  Set listening address      (currently %s)\n", bind_address);
-  printf("  -d  Set storage driver         (currently %s)\n", driver);
+  printf("  -l  Set listening address (currently %s)\n", bind_address);
+  printf("\n");
+  printf("Storage driver options:\n");
+  printf("  -a  Pass driver argument");
+  printf("  -d  Set storage driver\n");
   printf("  -i  Print selected driver info\n");
-  printf("  -p  Set listening port         (currently %d)\n", port);
   printf("\n");
   printf("Drivers:\n");
   driver_list();

@@ -1,3 +1,3 @@
 # Basic configuration
-CFLAGS   = -I. -Icore
-SRCFILES = core/main.c core/events.c core/messages.c core/driver.c
+CFLAGS  = -s -O3 -I. -Icore
+SOURCES = core/main.c core/events.c core/messages.c core/driver.c
