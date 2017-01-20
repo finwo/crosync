@@ -13,7 +13,7 @@ void print_help( char *name, char *bind_address )
   printf("  -l  Set listening address (currently %s)\n", bind_address);
   printf("\n");
   printf("Storage driver options:\n");
-  printf("  -a  Pass driver argument");
+  printf("  -a  Pass driver argument\n");
   printf("  -d  Set storage driver\n");
   printf("  -i  Print selected driver info\n");
   printf("\n");

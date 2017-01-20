@@ -1,3 +1,0 @@
-[submodule "lib/mongoose"]
-	path = lib/mongoose
-	url = git@github.com:cesanta/mongoose.git

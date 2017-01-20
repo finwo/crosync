@@ -7,12 +7,6 @@
 #include "driver.h"
 #include "events.h"
 #include "messages.h"
-#include "mongoose.h"
-
-static void ev_handler( struct mg_connection *nc, int ev, void *p ) {
-  if (ev != MG_EV_HTTP_REQUEST) return;
-  
-}
 
 int main( int argc, char **argv )
 {
