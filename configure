@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
 
 echo "Building Makefile"
-cat make/compiler       >  Makefile
-cat make/config         >> Makefile
-cat make/lib.*          >> Makefile
-cat driver/*/make       >> Makefile
-cat make/target.default >> Makefile
+
+echo -n "  - Compiler --- "
+CC=`which musl-gcc gcc 2>/dev/null | grep -iv "not found"` || { echo "NOT FOUND" ; exit 1 ; }
+echo $CC
+echo "CC = $CC" > Makefile
+
+echo "  - Core"
+echo "CFLAGS = -s -O3 -I . -I core" >> Makefile
+echo "SOURCES =" >> Makefile
+for i in `find core | grep \.c` ; do echo "    - $i" ; echo "SOURCES += $i" >> Makefile ; done
+
+echo "  - Libraries"
+for i in `ls make | grep lib | tr '.' '\n' | grep -v lib` ; do echo "    - $i" ; cat make/lib.$i >> Makefile ; done
+
+echo "  - Drivers"
+for i in `ls driver` ; do echo "    - $i" ; cat driver/$i/make >> Makefile 2>/dev/null ; done;
+
+echo "  - Build targets"
+for i in `ls make | grep target | tr '.' '\n' | grep -v target` ; do echo "    - $i" ; cat make/target.$i >> Makefile ; done

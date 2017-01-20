@@ -1,2 +1,0 @@
-# Detect which compiler to use
-CC = $(shell which musl-gcc gcc 2>/dev/null | grep -v "not found" | head -n 1 || echo none)
