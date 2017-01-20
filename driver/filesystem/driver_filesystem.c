@@ -7,11 +7,11 @@ char *driver_filesystem_info() {
   printf("\n");
   printf("Driver: filesystem\n");
   printf("\n");
+  printf("Stores objects into seperate files. In a simple directory structure:\n");
+  printf("  /path/[type]/[id].pev\n");
   printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
-  printf("\n");
+  printf("The default storage path is /srv/crud/data but can be changed by\n");
+  printf("providing the storage path in the driver argument.\n");
   printf("\n");
 }
 
