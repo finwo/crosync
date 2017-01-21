@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "events.h"
 
@@ -14,50 +15,76 @@ typedef struct {
   void *function;
 } Listener;
 
+typedef struct {
+  void *resource;
+  void *function;
+  void *extra_arg;
+} IO_Listener;
+
 // Tell the compiler how to call events
 void (*functionPointer)(void *data);
 
-// A list and it's size
-Listener *listeners;
-int listeners_count = 0;
+// Lists and their size
+Listener *namedListenerList = 0;
+int namedListenerCount = 0;
+IO_Listener *ioListenerList = 0;
+int ioListenerCount = 0;
 
 // We'll use this more than once
-int eventPointerSize = sizeof(Listener *);
+int eventPointerSize = sizeof(Listener);
+int ioPointerSize    = sizeof(IO_Listener);
+
+// Will sleep for [sleeptime] microseconds if no event was fired
+void ev_poll( unsigned int sleeptime )
+{
+  int eventFired = 0;
+  
+  if(!eventFired) {
+    usleep(sleeptime);
+  }
+}
+
+// Fire a function once the 'select'-able resource is ready
+// This will only fire once
+void ev_io( void *resource, void *function, void *extra_arg ) {
+  
+}
 
 // Register an event
-void event_on( char *eventName, void *function )
+void ev_on( char *eventName, void *function )
 {
   // Create a new listener
   Listener listener = { eventName, function };
-  listeners_count++;
+  namedListenerCount++;
   
   char *newListLocation;
   
   // Make sure we have the memory
-  if ( listeners ) {
-    newListLocation = realloc( listeners, eventPointerSize * listeners_count );
+  if ( namedListenerList ) {
+    newListLocation = realloc( namedListenerList, eventPointerSize * namedListenerCount );
     if ( newListLocation ) {
-      listeners = (void *)newListLocation;
+      namedListenerList = (void *)newListLocation;
     } else {
       exit(1);
     }
   } else {
-    listeners = malloc( eventPointerSize * listeners_count );
+    namedListenerList = malloc( eventPointerSize * namedListenerCount );
   }
   
   // 'Register' the listener
-  *(listeners+((listeners_count-1)*eventPointerSize)) = listener;
+  *(namedListenerList+((namedListenerCount-1)*eventPointerSize)) = listener;
 }
 
 // Trigger an event
-void event_fire( char *eventName, void *data )
+// Triggers instantly. This is BLOCKING
+void ev_fire( char *eventName, void *data )
 {
   int i;
   Listener *listener;
   
   // Loop through listeners
-  for( i = 0 ; i < listeners_count ; i++ ) {
-    listener = listeners + ( eventPointerSize * i );
+  for( i = 0 ; i < namedListenerCount ; i++ ) {
+    listener = namedListenerList + ( eventPointerSize * i );
     
     // Skip if the event name does not match
     if ( strcmp(eventName, listener->eventName) ) continue;

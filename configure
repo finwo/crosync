@@ -19,4 +19,4 @@ echo "  - Drivers"
 for i in `ls driver` ; do echo "    - $i" ; cat driver/$i/make >> Makefile 2>/dev/null ; done;
 
 echo "  - Build targets"
-for i in `ls make | grep target | tr '.' '\n' | grep -v target` ; do echo "    - $i" ; cat make/target.$i >> Makefile ; done
+for i in `ls make | grep target | sort | tr '.' '\n' | grep -v target` ; do echo "    - $i" ; cat make/target.$i >> Makefile ; done

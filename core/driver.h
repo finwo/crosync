@@ -2,6 +2,7 @@
 typedef struct {
   char *name;
   void *info;
+  void *init;
   void *types;
   void *ids;
   void *get;
@@ -14,7 +15,8 @@ typedef struct {
 void driver_register( Driver *driver );
 
 // The actual driver functions to be called
-char * driver_info();
+char * driver_info();                                       // Print driver info to stdout
+char * driver_init(char *arg);                              // Let the driver know it's gonna be used
 char * driver_types();                                      // Returns pointer to CSV list of types
 char * driver_ids(char *type);                              // Returns pointer to CSV list of IDs
 char * driver_get_object(char *type, char *id);             // Returns a single object

@@ -15,6 +15,11 @@ char *driver_filesystem_info() {
   printf("\n");
 }
 
+// Initialize driver, we're running this show
+char *driver_filesystem_init(char *arg) {
+  
+}
+
 // Returns pointer to CSV list of types
 char *driver_filesystem_list_types() {
   
@@ -51,6 +56,7 @@ void register_filesystem_driver(void) {
     Driver driver;
     driver.name = "filesystem";
     driver.info       = &driver_filesystem_info;
+    driver.init       = &driver_filesystem_init;
     driver.types      = &driver_filesystem_list_types;
     driver.ids        = &driver_filesystem_list_ids;
     driver.get        = &driver_filesystem_get_object;

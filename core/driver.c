@@ -70,6 +70,10 @@ char * driver_info() {
   drv0 = selectedDriver->info;
   return (*drv0)();
 }
+char * driver_init(char *arg) {
+  drv1 = selectedDriver->init;
+  return (*drv1)(arg);
+}
 char * driver_types() {
   drv0 = selectedDriver->types;
   return (*drv0)();

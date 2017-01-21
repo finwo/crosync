@@ -6,19 +6,20 @@
 #include "defines.h"
 #include "driver.h"
 #include "events.h"
+#include "http.h"
 #include "messages.h"
 
 int main( int argc, char **argv )
 {
   
-  int opt;
-  char *bind_address = "tcp://127.0.0.1:80";
-  char *driver = "filesystem", *driver_arg;
+  int opt, port = 80;
+  char *bind_address = "127.0.0.1";
+  char *driver = "filesystem", *driver_arg = 0;
   
   unsigned char flags = 0;
   
   // Parse command line arguments
-  while((opt=getopt(argc, argv, "a:d:hil:"))!=-1) {
+  while((opt=getopt(argc, argv, "a:d:hil:p:"))!=-1) {
     switch(opt) {
       case 'a':
         driver_arg = optarg;
@@ -32,11 +33,13 @@ int main( int argc, char **argv )
       case 'l':
         bind_address = optarg;
         break;
-      
+      case 'p':
+        port = atoi(optarg);
+        break;
         
       case 'h':
       default:
-        print_help(*argv, bind_address);
+        print_help(*argv, bind_address, port);
         exit(0);
     }
   }
@@ -51,6 +54,14 @@ int main( int argc, char **argv )
   if(flags&1) {
     driver_info();
     exit(0);
+  }
+  
+  // Let the driver initialize
+  driver_init(driver_arg);
+  
+  // The event loop
+  for(;;) {
+    ev_poll(5000);
   }
   
   printf("Address: %s\n", bind_address);
