@@ -1,2 +1,1 @@
-# filesystem driver
 SOURCES += driver/filesystem/driver_filesystem.c

@@ -1,1 +1,1 @@
-void print_help(char *name, char *bind_address, int port );
+void print_usage(char *programName);
