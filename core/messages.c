@@ -10,6 +10,7 @@ void print_usage(char *programName)
   printf("Options:\n");
   printf("  -a  Storage driver argument\n");
   printf("  -d  Select storage driver (default: filesystem)\n");
+  printf("  -i  Show driver info\n");
   printf("  -p  Set listening port    (default: 8080)\n");
   printf("\n");
   printf("Drivers:\n");

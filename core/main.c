@@ -6,18 +6,22 @@
 
 int main(int argc, char **argv)
 {
-
-  unsigned char flags = 0;
-  char *driver = "filesystem";
   int opt, port = 8080;
+  driver_select("filesystem");
   
-  while((opt=getopt(argc, argv, "hp:d:"))!=-1) {
+  while((opt=getopt(argc, argv, "d:hip:"))!=-1) {
     switch(opt) {
       case 'd':
-        driver = optarg;
+        if(!driver_select(optarg)) {
+          fprintf(stderr, "Driver '%s' does not exist\n", optarg);
+          exit(2);
+        }
         break;
       case 'h':
         print_usage(*argv);
+        exit(0);
+      case 'i':
+        driver_info();
         exit(0);
       case 'p':
         port = atoi(optarg);
