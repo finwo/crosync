@@ -19,7 +19,7 @@ Event * event_named_last()
 Event * event_on(char *name, void *function, void *udata)
 {
   // Create the new event
-  Event *event = malloc(sizeof(Event));
+  Event *event = calloc(1, sizeof(Event));
   event->name  = name;
   event->func  = function;
   event->udata = udata;

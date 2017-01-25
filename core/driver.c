@@ -31,7 +31,7 @@ void driver_register( Driver *new_driver )
       exit(3);
     }
   } else {
-    driver_list = malloc(driver_pointer_size*driver_list_length);
+    driver_list = calloc(driver_list_length, driver_pointer_size);
   }
   *(driver_list + ((driver_list_length-1)*driver_pointer_size) ) = new_driver;
 }

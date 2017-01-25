@@ -2,13 +2,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "http.h"
 #include "messages.h"
 
 int main(int argc, char **argv)
 {
   // Pre-define some vars
   int opt, port = 8080;
+  dyad_Stream *serv;
   driver_select("filesystem");
+  int running = 1;
   
   // Parse command-line arguments
   while((opt=getopt(argc, argv, "d:hip:"))!=-1) {
@@ -32,6 +35,12 @@ int main(int argc, char **argv)
         print_usage(*argv);
         exit(1);
     }
+  }
+  
+  http_start(port);
+  
+  while(running) {
+    running &= http_poll();
   }
   
   return 0;
