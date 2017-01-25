@@ -12,6 +12,9 @@ void driver_filesystem_info()
   printf("    hold all data. If the directory does not exist yet, it will be\n");
   printf("    created.\n");
   printf("\n");
+  printf("  Files will be stored in percent-encoded format. This keeps the\n");
+  printf("    amount of conversions at a minimum.\n");
+  printf("\n");
 }
 
 // Register the driver to main

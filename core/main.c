@@ -6,9 +6,11 @@
 
 int main(int argc, char **argv)
 {
+  // Pre-define some vars
   int opt, port = 8080;
   driver_select("filesystem");
   
+  // Parse command-line arguments
   while((opt=getopt(argc, argv, "d:hip:"))!=-1) {
     switch(opt) {
       case 'd':
