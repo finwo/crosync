@@ -1,2 +1,0 @@
-SOURCES += lib/dyad/src/dyad.c
-CFLAGS  += -I lib/dyad/src

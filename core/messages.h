@@ -1,1 +1,0 @@
-void print_usage(char *programName);

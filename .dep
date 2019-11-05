@@ -1,0 +1,4 @@
+AUTHOR="Robin Bron <finwo@pm.me>"
+NAME="tinycrud"
+DEPS=()
+DEPS+=("rxi/dyad")
