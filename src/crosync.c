@@ -1,4 +1,6 @@
+#include <getopt.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -54,7 +56,26 @@ static void onError(dyad_Event *e) {
   printf("server error: %s\n", e->msg);
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+  int port = 8080;
+
+  int opt = 0;
+  static struct option long_options[] = {
+    { "port", required_argument, 0, 'p' },
+    { 0,      0,                 0, 0   },
+  };
+
+  int long_index = 0;
+  while ((opt = getopt_long(argc, argv, "p:",
+          long_options, &long_index )) != -1) {
+    switch(opt) {
+      case 'p':
+        port = atoi(optarg);
+        break;
+    }
+  }
+
+
   dyad_Stream *s;
   dyad_init();
 
@@ -62,7 +83,7 @@ int main() {
   dyad_addListener(s, DYAD_EVENT_ERROR,  onError,  NULL);
   dyad_addListener(s, DYAD_EVENT_ACCEPT, onAccept, NULL);
   dyad_addListener(s, DYAD_EVENT_LISTEN, onListen, NULL);
-  dyad_listen(s, 8000);
+  dyad_listen(s, port);
 
   while (dyad_getStreamCount() > 0) {
     dyad_update();
