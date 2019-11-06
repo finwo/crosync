@@ -1,4 +1,4 @@
 AUTHOR="Robin Bron <finwo@pm.me>"
-NAME="tinycrud"
+NAME="crosync"
 DEPS=()
 DEPS+=("rxi/dyad")

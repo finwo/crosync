@@ -10,10 +10,9 @@ OBJ=$(SRC:.c=.o)
 .c.o:
 	$(CC) $(INCLUDES) $(CFLAGS) -c -o $@ $^
 
-tinycrud: $(OBJ)
+crosync: $(OBJ)
 	$(CC) $(INCLUDES) $(CFLAGS) -o $@ $^
 
 .PHONY: clean
 clean:
 	rm -f $(OBJ)
-	rm -f tinycrud
