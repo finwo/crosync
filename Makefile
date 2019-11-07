@@ -4,13 +4,7 @@ INCLUDES?=
 LIBS?=
 
 INCLUDES+=-I lib/rxi/dyad/src
-SRC+=$(wildcard lib/rxi/dyad/src/*.c)
-
-INCLUDES+=-I lib/antirez/rax
-LIBS+=-lm
-SRC+=lib/antirez/rax/crc16.c
-SRC+=lib/antirez/rax/rax.c
-SRC+=lib/antirez/rax/rc4rand.c
+SRC+=lib/rxi/dyad/src/dyad.c
 
 OBJ=$(SRC:.c=.o)
 
