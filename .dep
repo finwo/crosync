@@ -2,3 +2,4 @@ AUTHOR="Robin Bron <finwo@pm.me>"
 NAME="crosync"
 DEPS=()
 DEPS+=("rxi/dyad")
+DEPS+=("finwo/http-parser")

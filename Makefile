@@ -6,6 +6,9 @@ LIBS?=
 INCLUDES+=-I lib/rxi/dyad/src
 SRC+=lib/rxi/dyad/src/dyad.c
 
+INCLUDES+=-I lib/finwo/http-parser/src
+SRC+=lib/finwo/http-parser/src/http.c
+
 OBJ=$(SRC:.c=.o)
 
 .c.o:
