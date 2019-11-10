@@ -32,10 +32,12 @@ typedef struct {
 
 kv *data = NULL;
 
-static void list(struct http_parser_request *request) {
-  dyad_Event *e = request->udata;
+static void list(struct http_parser_pair *pair) {
+  dyad_Event *e = pair->udata;
+  struct http_parser_message *req = pair->request;
+  struct http_parser_message *res = pair->response;
+
   kv *entry = data;
-  printf("LIST\n");
 
   char *now = calloc(1, 32);
   time_t now_t = time(NULL);
@@ -71,8 +73,10 @@ static void list(struct http_parser_request *request) {
   dyad_write(e->stream, "0\r\n\r\n", 5);
 }
 
-static void read(struct http_parser_request *request, char *key) {
-  dyad_Event *e = request->udata;
+static void read(struct http_parser_pair *pair, char *key) {
+  dyad_Event *e = pair->udata;
+  struct http_parser_message *req = pair->request;
+  struct http_parser_message *res = pair->response;
   kv *entry = data;
 
   char *now = calloc(1, 32);
@@ -81,8 +85,8 @@ static void read(struct http_parser_request *request, char *key) {
   strftime(now, 32, "%Y-%m-%dT%H:%m:%SZ", now_to);
 
   // Showing the list
-  if (!strcmp("/", request->path)) {
-    list(request);
+  if (!strcmp("/", req->path)) {
+    list(pair);
     free(now);
     return;
   }
@@ -114,8 +118,9 @@ static void read(struct http_parser_request *request, char *key) {
   free(now);
 }
 
-static void write(struct http_parser_request *request, char *key) {
-  dyad_Event *e = request->udata;
+static void write(struct http_parser_pair *pair, char *key) {
+  dyad_Event *e = pair->udata;
+  struct http_parser_message *req = pair->request;
   kv *entry;
 
   char *now = calloc(1, 32);
@@ -124,7 +129,7 @@ static void write(struct http_parser_request *request, char *key) {
   strftime(now, 32, "%Y-%m-%dT%H:%m:%SZ", now_to);
 
   // No key/value = error
-  if ((!strcmp("/", request->path)) || (!request->body)) {
+  if ((!strcmp("/", req->path)) || (!req->body)) {
     dyad_writef(e->stream,
       "HTTP/1.0 400 Bad Request\r\n"
       "Date: %s\r\n"
@@ -136,26 +141,26 @@ static void write(struct http_parser_request *request, char *key) {
 
   // Push into stack
   entry = malloc(sizeof(kv));
-  entry->size = request->bodysize;
+  entry->size = req->bodysize;
   entry->next = data;
   entry->iat = time(NULL);
   entry->key = calloc(1,strlen(key)+1);
-  entry->value = calloc(1,strlen(request->body)+1);
+  entry->value = calloc(1,strlen(req->body)+1);
   strcpy(entry->key, key);
-  strcpy(entry->value, request->body);
+  strcpy(entry->value, req->body);
   data = entry;
 
   // No return value
   dyad_writef(e->stream,
-    "HTTP/1.0 204 No Content\r\n"
+    "HTTP/1.0 202 Accepted\r\n"
     "Date: %s\r\n"
     "\r\n"
   , now);
   free(now);
 }
 
-static void delete(struct http_parser_request *request, char *key) {
-  dyad_Event *e = request->udata;
+static void delete(struct http_parser_pair *pair, char *key) {
+  dyad_Event *e = pair->udata;
   dyad_writef(e->stream,
       "HTTP/1.0 200 OK\r\n"
       "\r\n"
@@ -164,44 +169,47 @@ static void delete(struct http_parser_request *request, char *key) {
 }
 
 static void onRequest(struct http_parser_event *ev) {
-  struct http_parser_request *request = ev->request;
-  dyad_Event *e = request->udata;
+  struct http_parser_pair *pair = ev->pair;
+  dyad_Event *e = ev->udata;
+
+  struct http_parser_message *req = pair->request;
+  struct http_parser_message *res = pair->response;
 
   // Fetch the key
   char *key = calloc(1,8192);
-  sscanf(request->path, "/%s", key);
+  sscanf(req->path, "/%s", key);
 
   // We're reading
-  if (!strcasecmp(request->method, "GET")) {
-    read(request, key);
+  if (!strcasecmp(req->method, "GET")) {
+    read(pair, key);
   }
 
   // We're writing
-  if (!strcasecmp(request->method, "POST")) {
-    write(request, key);
+  if (!strcasecmp(req->method, "POST")) {
+    write(pair, key);
   }
 
   // We're deleting
-  if (!strcasecmp(request->method, "DELETE")) {
-    delete(request, key);
+  if (!strcasecmp(req->method, "DELETE")) {
+    delete(pair, key);
   }
 
   free(key);
   dyad_end(e->stream);
-  http_parser_request_free(request);
+  http_parser_pair_free(pair);
   return;
 }
 
 static void onData(dyad_Event *e) {
-  struct http_parser_request *request = e->udata;
-  request->udata = e;
-  http_parser_request_data(request, e->data, e->size);
+  struct http_parser_pair *pair = e->udata;
+  pair->udata = e;
+  http_parser_pair_request_data(pair, e->data, e->size);
 }
 
 static void onAccept(dyad_Event *e) {
-  struct http_parser_request *request = http_parser_request_init();
-  request->onRequest = onRequest;
-  dyad_addListener(e->remote, DYAD_EVENT_DATA, onData, request);
+  struct http_parser_pair *pair = http_parser_pair_init(NULL);
+  pair->onRequest = onRequest;
+  dyad_addListener(e->remote, DYAD_EVENT_DATA, onData, pair);
 }
 
 static void onListen(dyad_Event *e) {
