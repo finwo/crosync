@@ -213,8 +213,13 @@ static void onError(dyad_Event *e) {
 }
 
 int main(int argc, char *argv[]) {
-  int port        = 8080;
+  char *aPort = getenv("PORT");
+  int   iPort = 5000;
   int interactive = 1;
+
+  if (aPort) {
+    iPort = atoi(aPort);
+  }
 
   int opt = 0;
   static struct option long_options[] = {
@@ -227,7 +232,7 @@ int main(int argc, char *argv[]) {
           long_options, &long_index )) != -1) {
     switch(opt) {
       case 'p':
-        port = atoi(optarg);
+        iPort = atoi(optarg);
         break;
     }
   }
@@ -239,7 +244,7 @@ int main(int argc, char *argv[]) {
   dyad_addListener(s, DYAD_EVENT_ERROR,  onError,  NULL);
   dyad_addListener(s, DYAD_EVENT_ACCEPT, onAccept, NULL);
   dyad_addListener(s, DYAD_EVENT_LISTEN, onListen, NULL);
-  dyad_listen(s, port);
+  dyad_listen(s, iPort);
 
   while (dyad_getStreamCount() > 0) {
     dyad_update();
