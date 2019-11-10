@@ -10,7 +10,7 @@ extern "C" {
 #include <time.h>
 
 #include "dyad.h"
-#include "http.h"
+#include "http-parser.h"
 
 #ifndef NULL
 #define NULL ((void*)0)
@@ -21,9 +21,9 @@ extern "C" {
 #define CROSYNC_BODY 2
 #define CROSYNC_RESP 3
 
-static void onRequest(http_event *ev) {
+static void onRequest(struct http_parser_event *ev) {
   dyad_Event *e = ev->request->udata;
-  http_request *request = ev->request;
+  struct http_parser_request *request = ev->request;
   dyad_writef(e->stream,
       "HTTP/1.0 200 OK\r\n"
       "\r\n"
@@ -33,13 +33,13 @@ static void onRequest(http_event *ev) {
 }
 
 static void onData(dyad_Event *e) {
-  http_request *request = e->udata;
+  struct http_parser_request *request = e->udata;
   request->udata = e;
-  http_request_data(request, e->data, e->size);
+  http_parser_request_data(request, e->data, e->size);
 }
 
 static void onAccept(dyad_Event *e) {
-  http_request *request = http_request_init();
+  struct http_parser_request *request = http_parser_request_init();
   request->onRequest = onRequest;
   dyad_addListener(e->remote, DYAD_EVENT_DATA, onData, request);
 }

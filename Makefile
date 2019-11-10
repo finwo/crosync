@@ -7,7 +7,7 @@ INCLUDES+=-I lib/rxi/dyad/src
 SRC+=lib/rxi/dyad/src/dyad.c
 
 INCLUDES+=-I lib/finwo/http-parser/src
-SRC+=lib/finwo/http-parser/src/http.c
+SRC+=lib/finwo/http-parser/src/http-parser.c
 
 OBJ=$(SRC:.c=.o)
 
