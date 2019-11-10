@@ -7,6 +7,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <time.h>
 
 #include "dyad.h"
@@ -21,15 +22,174 @@ extern "C" {
 #define CROSYNC_BODY 2
 #define CROSYNC_RESP 3
 
-static void onRequest(struct http_parser_event *ev) {
-  dyad_Event *e = ev->request->udata;
-  struct http_parser_request *request = ev->request;
+typedef struct {
+  void *next;
+  time_t iat;
+  char *key;
+  char *value;
+  int size;
+} kv;
+
+kv *data = NULL;
+
+static void list(struct http_parser_request *request) {
+  dyad_Event *e = request->udata;
+  kv *entry = data;
+  printf("LIST\n");
+
+  char *now = calloc(1, 32);
+  time_t now_t = time(NULL);
+  struct tm* now_to = gmtime(&now_t);
+  strftime(now, 32, "%Y-%m-%dT%H:%m:%SZ", now_to);
+
+  if (!entry) {
+    dyad_writef(e->stream,
+      "HTTP/1.0 204 No Content\r\n"
+      "Date: %s\r\n"
+      "\r\n"
+    , now);
+    free(now);
+    return;
+  }
+
+  // Header start
+  dyad_writef(e->stream,
+    "HTTP/1.0 200 OK\r\n"
+    "Date: %s\r\n"
+    "Transfer-Encoding: chunked\r\n"
+    "\r\n"
+  , now);
+  free(now);
+
+  // Write our data
+  while(entry) {
+    dyad_writef(e->stream, "%x\r\n"    , strlen(entry->key) + 2);
+    dyad_writef(e->stream, "%s\r\n\r\n",        entry->key     );
+    entry = entry->next;
+  }
+
+  dyad_write(e->stream, "0\r\n\r\n", 5);
+}
+
+static void read(struct http_parser_request *request, char *key) {
+  dyad_Event *e = request->udata;
+  kv *entry = data;
+
+  char *now = calloc(1, 32);
+  time_t now_t = time(NULL);
+  struct tm* now_to = gmtime(&now_t);
+  strftime(now, 32, "%Y-%m-%dT%H:%m:%SZ", now_to);
+
+  // Showing the list
+  if (!strcmp("/", request->path)) {
+    list(request);
+    free(now);
+    return;
+  }
+
+  while(entry) {
+    if (!strcmp(key, entry->key)) {
+      dyad_writef(e->stream,
+        "HTTP/1.0 200 OK\r\n"
+        "Date: %s\r\n"
+      , now);
+      free(now);
+      dyad_writef(e->stream,
+        "Content-Length: %d\r\n"
+        "\r\n"
+      , entry->size);
+      dyad_write(e->stream, entry->value, entry->size);
+      return;
+    }
+    entry = entry->next;
+  }
+
+
+  dyad_writef(e->stream,
+      "HTTP/1.0 404 Not Found\r\n"
+      "Date: %s\r\n"
+      "\r\n"
+      "Not Found\r\n"
+  , now);
+  free(now);
+}
+
+static void write(struct http_parser_request *request, char *key) {
+  dyad_Event *e = request->udata;
+  kv *entry;
+
+  char *now = calloc(1, 32);
+  time_t now_t = time(NULL);
+  struct tm* now_to = gmtime(&now_t);
+  strftime(now, 32, "%Y-%m-%dT%H:%m:%SZ", now_to);
+
+  // No key/value = error
+  if ((!strcmp("/", request->path)) || (!request->body)) {
+    dyad_writef(e->stream,
+      "HTTP/1.0 400 Bad Request\r\n"
+      "Date: %s\r\n"
+      "\r\n"
+    , now);
+    free(now);
+    return;
+  }
+
+  // Push into stack
+  entry = malloc(sizeof(kv));
+  entry->size = request->bodysize;
+  entry->next = data;
+  entry->iat = time(NULL);
+  entry->key = calloc(1,strlen(key)+1);
+  entry->value = calloc(1,strlen(request->body)+1);
+  strcpy(entry->key, key);
+  strcpy(entry->value, request->body);
+  data = entry;
+
+  // No return value
+  dyad_writef(e->stream,
+    "HTTP/1.0 204 No Content\r\n"
+    "Date: %s\r\n"
+    "\r\n"
+  , now);
+  free(now);
+}
+
+static void delete(struct http_parser_request *request, char *key) {
+  dyad_Event *e = request->udata;
   dyad_writef(e->stream,
       "HTTP/1.0 200 OK\r\n"
       "\r\n"
-      "Method: %s\r\n"
-  , request->method);
+      "DELETE %s\r\n"
+  , key);
+}
+
+static void onRequest(struct http_parser_event *ev) {
+  struct http_parser_request *request = ev->request;
+  dyad_Event *e = request->udata;
+
+  // Fetch the key
+  char *key = calloc(1,8192);
+  sscanf(request->path, "/%s", key);
+
+  // We're reading
+  if (!strcasecmp(request->method, "GET")) {
+    read(request, key);
+  }
+
+  // We're writing
+  if (!strcasecmp(request->method, "POST")) {
+    write(request, key);
+  }
+
+  // We're deleting
+  if (!strcasecmp(request->method, "DELETE")) {
+    delete(request, key);
+  }
+
+  free(key);
   dyad_end(e->stream);
+  http_parser_request_free(request);
+  return;
 }
 
 static void onData(dyad_Event *e) {
